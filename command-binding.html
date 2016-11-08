@@ -1,0 +1,31 @@
+
+<dom-module id="command-binding">
+    <template></template>
+    <script>
+        HTMLImports.whenReady(function () {
+            Polymer({
+                is: "command-binding",
+                
+                properties: {
+                    name: String,
+                    do: String,
+                    undo: String
+                },
+                
+                attached: function () {
+                    this.registerCommand();
+                },
+                
+                registerCommand: function () {
+                    console.log("registering " + this.name);
+                    this.fire("command.register", {
+                        name: this.name,
+                        receiver: this.domHost,
+                        do: this.domHost[this.do],
+                        description: Polymer.dom(this).innerHTML.trim()
+                    });
+                }
+            })
+        });
+    </script>
+</dom-module>

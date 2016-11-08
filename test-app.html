@@ -1,0 +1,50 @@
+<link rel="import" href="./todo-list.html">
+<link rel="import" href="./cobra-commander.html">
+<link rel="import" href="./command-binding.html">
+
+<dom-module id="test-app">
+    <template>
+        <cobra-commander id="commander">
+            <command-binding name="addTodo" do="addTodo"></command-binding>        
+            <command-binding name="removeTodo" do="removeTodo"></command-binding>
+        </cobra-commander>
+
+        <todo-list todos="{{ todos }}"></todo-list>
+    </template>
+    <script>
+        HTMLImports.whenReady(function () {
+            Polymer({
+                is: "test-app",
+
+                properties: {
+                    todos: {
+                        value: function () { 
+                            return [{
+                                task: "Batch cook dinners",
+                                notes: "Dinners for entire week must be cooked",
+                                category: "House Work",
+                                isComplete: false
+                            }]; 
+                        },
+                        type: Array
+                    },
+                },
+
+                addTodo: function (args) {
+                    this.push("todos", {
+                        task: args.task,
+                        category: args.category,
+                        notes: args.notes,
+                        isComplete: false
+                    });
+                },
+
+                removeTodo: function (args) {
+                    this.set("todos", this.todos.filter(function (todo) {
+                        return todo.text !== args.todo.text;
+                    }));
+                }
+            });
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,68 @@
+<link rel="import" href="./command-binding.html">
+
+<dom-module id="cobra-commander">
+    <template><content></content></template>
+    <script>
+        HTMLImports.whenReady(function () {
+            Polymer({
+                is: "cobra-commander",
+
+                properties: {
+                    commands: {
+                        value: {},
+                        type: Object
+                    }
+                },
+
+                listeners: {
+                    // "command.register": "onCommandRegister"
+                },
+
+                attached: function () {
+                    console.log("listening for registrations");
+                    this.addEventListener("command.register", this.onCommandRegister);
+                },
+
+                detached: function () {
+                    this.removeEventListener("command.register", this.onCommandRegister);
+                },
+
+                onCommandRegister: function (e) {
+                    var command = e.detail;
+                    this.registerCommand(command);
+                },
+
+                registerCommand: function (command) {
+                    if (this.commands[command.name]) {
+                        throw new Error(command.name + " is already a registered command. Not registering.")
+                    }
+                    
+                    this.commands[command.name] = command;
+                },
+
+                handle: function (commandName, args) {
+                    var command = this.commands[commandName];
+
+                    if (!command) {
+                        throw new Error("Unknown command " + commandName + " cannot be executed");
+                    }
+                    
+                        return Promise.resolve(command)
+                            .then(function (command) {
+                                return command.do.call(command.receiver, args);
+                            })
+                            .then(this.onSuccess.bind(this, command))
+                            .catch(this.onError.bind(this, command));
+                },
+
+                onSuccess: function (command) {
+                    this.fire(command.name + ".executed", command);
+                },
+
+                onError: function (command, error) {
+                    this.fire(command.name + ".failed", command)
+                }
+            });
+        });
+    </script>
+</dom-module>

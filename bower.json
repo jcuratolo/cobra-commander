@@ -1,0 +1,17 @@
+{
+  "name": "command-bindings",
+  "authors": [
+    "jcuratolo <jcuratolo@me.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

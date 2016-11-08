@@ -1,0 +1,111 @@
+<dom-module id="todo-list">
+    <template>
+        <cobra-commander id="commander"></cobra-commander>
+        <div class="row">
+            <div class="col-sm-4">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <h3>Add A Todo <button class="btn btn-xs pull-right" on-click="onEditButtonClicked">{{ getEditButtonText(mode) }}</button></h3>
+                    </li>
+                    <li class="list-group-item">
+
+                        <!--TASK-->
+                        <div class="form-group">
+                            <label for="input" class="control-label">Task</label>
+                            <input type="text" id="input" class="form-control">
+                        </div>
+
+                        <!--CATEGORY-->
+                        <div class="form-group">
+                            <label for="category" class="control-label">Category</label>
+                            <input type="text" id="category" class="form-control">
+                        </div>
+
+                        <!--NOTES-->
+                        <div class="form-group">
+                            <label for="notes" class="control-label">Notes</label>
+                            <textarea id="notes" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <!--ADD TODO-->
+                        <button class="btn btn-success" on-click="onAddTodoClicked">
+                            Add
+                        </button>
+                    </li>
+                    <template is="dom-repeat" items="{{ todos }}" as="todo">
+
+                        <li class="list-group-item">
+                            <h4>{{ todo.task }}</h4>
+                            <p>{{ todo.notes }}</p>
+                            <span class="badge">{{ todo.category }}</span>
+                            <span hidden$="{{ shouldHideEditingControls(mode) }}">
+                                <button class="btn btn-xs btn-info" hidden>Edit</button>
+                                <button class="btn btn-xs btn-danger" on-click="onRemoveTodoClicked" hidden>X</button>
+                            </span>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: "todo-list",
+
+            properties: {
+                todos: Array,
+                mode: {
+                    value: "add",
+                    type: String
+                }
+            },
+
+            onAddTodoClicked: function () {
+                var input = this.$.input;
+                var category = this.$.category;
+                var notes = this.$.notes;
+
+                this.$.commander.handle("addTodo", {
+                    task: input.value,
+                    category: category.value,
+                    notes: notes.value
+                }).then(function () {
+                    input.value = "";
+                    category.value = "";
+                    notes.value = "";
+                });
+            },
+
+            onRemoveTodoClicked: function (e) {
+                var todo = e.model.todo;
+                this.$.commander.handle("removeTodo", {
+                    todo: todo 
+                });
+            },
+
+            onEditButtonClicked: function (e) {
+                this.mode === "edit" ?
+                    this.setMode("default") :
+                    this.setMode("edit");
+            },
+
+            setMode: function (mode) {
+                this.set("mode", mode || "default");
+            },
+
+            getEditButtonText: function (mode) {
+                return mode === "edit" ? "Done" : "Edit";
+            },
+
+            shouldHideEditingControls: function (mode) {
+                var hidden = true;
+
+                if (mode === "edit") {
+                    hidden = false;
+                }
+
+                return hidden;
+            }
+        })
+    </script>
+</dom-module>
